@@ -1,0 +1,233 @@
+---
+title: "R Notebook"
+output:
+  html_notebook: default
+  html_document:
+    df_print: output
+  pdf_document: 
+    keep_tex: true
+---
+
+```{r}
+library(tidyverse)
+library(plotly)
+library(ggplot2)
+library(ggfortify)
+library(ggpubr)
+library(sciplot)
+library(lsr)
+library(knitr)
+```
+
+```         
+                                                   Abstract
+```
+
+This survey analysis was performed with scales obtained from the Becks Cognitive Insight Scale (Beck, Bauruch, Balter, Steer, & Warman, 2004) and The Centrality of Religiosity Scale (Huber & Huber, 2012) to see if there is a relationship between the participants Insight and Religiosity. This survey collected 45 participants. Additionally, the study looked at the relationship between Age and Gender with Insight and Religiosity scores. In addition to a plot that shows the approximate scores of each participant a linear regression was performed. In addition the the regression analysis a One-Way ANOVA were performed to examine the similar concept. A One-Way ANOVA were then Performed followed by an ANCOVA and MANOVA. There were no significance in any of the analysis performed. This could be due to the small sample size and poor diversity among the population.
+
+```
+
+```
+
+```         
+                                                     Methods
+```
+
+A bar graph were used to represent the overall scores of each participant. A regression analysis were then performed to analyze the relationship between the Religiosity (R Totals) and Insight (I Totals) scores. A One-Way ANOVA was then performed to also assess the relationship between Religiosity and Insight Scores. This was then followed by a Three-Way ANOVA to assess the relationship between the Religiosity scores, Age, and Gender to the Insight scores. Lastly, A MANOVA analysis were performed to combine the Religiosity and Insight scores to compare the relationship with the Age and Gender variables.
+
+```         
+                                                     Results
+```
+
+```{r}
+summary(FaithandInsight)
+```
+
+This is a summary of the data by column and questions.
+
+
+```{r}
+ggplot(FaithandInsight, aes(x = Subnum, y = Total)) + 
+  geom_col() +
+  geom_rug() +
+  labs(title = "Overall Participant Scores", x = "Participant") +
+  stat_smooth(method = "lm", col = 'red')
+```
+
+**Figure 1.1** Indicates the total of each participant. The lowest scores were around 40. The highest were around 80.
+
+
+```{r}
+regression.model <- lm( ITotal~ RTotal, data = FaithandInsight)
+ summary.lm( regression.model )
+```
+
+The regression F statistic (0.08519) indicates that there is low variability. However the P value (0.7718) indicates there is not any significance of the Religiosity scores(R Total) effecting the Insight scores(I Total).
+
+
+```{r}
+autoplot(regression.model)
+```
+
+**Figure 1.2** These graphs represents the regression model and indicate that the distributions of scores are too spread out to indicate a correlation between the Religiosity scores and the Insight scores.
+
+
+```{r}
+aov.model <- aov(formula = ITotal ~ RTotal, data = FaithandInsight)
+summary(aov.model)
+```
+
+This One-Way ANOVA and the P value (0.772) indicate there is not any significance of the Religiosity scores (R Total) effecting the Insight scores (I Total).
+
+
+```{r}
+autoplot(aov.model)
+```
+
+**Figure 1.3** These graphs represent the One-Way ANOVA and indicate that the distributions of scores are too spread out to indicate a correlation between the Religiosity scores and the Insight scores.
+
+
+```{r}
+aov.model2 <- aov(formula = ITotal ~ RTotal + Age + Gender, data = FaithandInsight)
+summary.aov(aov.model2)
+```
+
+The Three-way ANOVA and the Religiosity (R Total) P value of (.773), Age P value of (.480), and Gender P value of (.288) indicate there is not any significance of the Religiosity, Age, or Gender Variables effecting the Insight scores(I Total).
+
+
+```{r}
+ggplot(aov.model2, aes(group = Age, x =RTotal, y = ITotal, color = factor(Age, labels = c("18-30", 
+    "31-40", "41-50", "51-60", "60+")))) + 
+  theme(legend.text = element_text(colour="Black", size = 16, face = "bold")) +
+  theme(legend.background = element_rect(colour = 'Dark Blue', fill = 'Green', size = 3)) +
+  geom_boxplot() +
+  labs(color = "Age") +
+labs(title= "Scores by Age Groups") 
+```
+
+**Figure 1.4** Represents the Three-Way ANOVA and indicates that the highest scoring group of participants were in the 18-30 range and the least in the 31-40 range. Those in the 60+ range scored higher on Insight. Those in the 18-30 were second highest on Insight. There is little variation from the mean.
+
+
+```{r echo=FALSE}
+ggplot(aov.model2, aes(group = Gender, x = RTotal, y = ITotal, color = factor(Gender, labels = c("Male", 
+    "Female", "Decline to Answer")))) +
+  theme(legend.text = element_text(colour="Black", size = 16, face = "bold")) +
+  theme(legend.background = element_rect(colour = 'Dark Blue', fill = 'Green', size = 3)) +
+  geom_boxplot() +
+  labs(title= "Scores by Gender") +
+  labs(color = 'Gender', fill = 'Gender') +
+  stat_smooth(method = "aov", col = "red")
+  
+```
+
+**Figure 1.5** Represents the Three-Way ANOVA with a focus on Gender and indicates that female participants scored higher on Insight. There is little variation from the mean.
+
+
+```{r}
+manova.model <- manova(cbind(ITotal, RTotal) ~  Age*Gender, data = FaithandInsight)
+summary(manova.model, test = "Wilks")
+```
+
+This Two-way MANOVA indicates that the variables of Age and Gender fit the model well with little discrimination as indicated by the Wilks test scores being under 1. However the P value for Gender (.3061), and the P value for Age (.3158) indicate there in no significant in any of the variables to Religiosity or Insight.
+
+
+```{r echo=TRUE}
+ggplot(manova.model, aes(x = Age, y = Gender, color = factor(Gender, labels = c("Male", 
+    "Female", "Decline to Answer")))) + 
+  geom_violin() +
+  scale_x_continuous(labels =c("1" = "18-30", "2" = "31-40", "3" = "41-50", "4" = "51-60", "5" = "60+")) +
+  labs(color = "Gender") +
+  labs(title= "Gender Focus") +
+  stat_smooth(method = "aov", col = "red")
+```
+
+**Figure 1.6** Represents the MANOVA measuring the relationship of Age and Gender to Religiosity and Insight. It appears that females in the 18-31 range scored the highest on Religiosity and Insight. Males from the 41-60 range scored highest for their group.
+
+
+```{r}
+ggplot(manova.model, aes(x = Age, y = Gender, color = factor(Age, labels = c("18-30", "31-40", "41-50", "51-60", "60+")))) + 
+  geom_violin() +
+  labs(color = "Age") +
+  labs(title= "Age Focus") +
+  stat_smooth(method = "aov", col = "red")
+```
+
+**Figure 1.7** Represents the Age perspective of the above MANOVA and indicates that those in the 41-50 range scored the lowest on Religiosity and Insight while those in the 18-30 range scored the highest.
+
+```         
+ 
+                                                      Discussion
+```
+
+The Overall goal of this study is to see if there is a relationship between ones Insight and how Religious the participants are. In this Regard there was no evidence found to support that hypothesis. With the small sample collected it was discovered that participants in the 18-30 age group scored the highest on Insight and Religiosity. The 41-50 and the group that scored the least on Insight and Religiosity were those in the age group of 31-40. It was also found that females scored higher on both Religiosity and Insight scales. There was no significant correlation found between Age or Gender on Religiosity or Insight. In the future this study could yield better results with a larger sample size and a more diverse distribution among age. In the future switching the primary scale looked at from the Insight scores to the Religiosity scores would be beneficial for a better overall picture.
+
+```         
+
+                                                      Work Cited
+                              
+```
+
+Beck, A. T., Bauruch, E., Balter, J. M., Steer, R. A., & Warman, D. M. (2004). A new instrument for measuring insight: the Beck Cognitive Insight Scale. Elsevier, 319-329. Huber, S., & Huber, O. W. (2012). The Centrality of Religiosity Scale. Religions, 710-724.
+
+Anderson, M. L. (2016). Moral Foundations Theory: An Exploratory Study of Politics and 
+Decision-Making. Journal of Leadership, Accountability and Ethics, 13(2), 74-92. 
+
+Andes, P. (2019). Sidgwick's Dualism of Practical Reason, Evolutionary Debunking, and Moral 
+Psychoolgy. Cambridge University Press, 31, 361-377. 
+
+Bader, C. F. (2008). Unraveling Religious Worldviews: The Relationship between images of 
+God and Political Ideology in a Cross-Cultural Analysis. The Sociological Quarterly, 
+49(4), 689-718. 
+
+Drummond, D. C. (2017). EMPATHY AND THE EVOLUTION OF COMPASSION: FROM 
+DEEP HISTORY TO INFUSED VIRTUE. Joint Publication Board of Zygon, 258-278. 
+
+Eze, E. C. (2009). Between History and the Gods: Reason, Morality, and Politics in Today's 
+Africa. Indiana University Press, 55(2), 77-94. 
+
+Frederick, S. (2005). Cognative Reflection and Decision Making. Jounral of Economic 
+Perspectives, 19(1), 25-42. 
+
+Greely, A. M. (1988). Evidence that a Maternal Image of God Correlates with Liberal Politics. 
+Sociology and Social Research, 72: 150-4. 
+
+Gross, M. L. (1996). Moral Reasoning and Ideogical Affiliation: A cross-National Study. 
+Political Psychology, 17(2), 317-338. 
+
+Joldersma, C. W. (2011). Providential Deism, Divine Reason, and Locke's Educational Theory. 
+The Journal of Educational Thought, 45(2), 113. 
+
+Kuhn, T. (1996). The Structure of Scientific Revolutions. University of Chicago Press. 
+
+Locke, J. Y. (1989). Some thoughts concerning education. Oxford University Press., 1-352. 
+
+Loewen, P. C. (2019). Empathy and Political preferences. Retrieved from 
+www.princeton.edu/csdp/events/Loewen03162017. 
+
+Morris, S. G. (2020). Empathy and the Liberal-Conservative Political Divide in the U.S. Journal 
+of Social and Political Psychology, 8(1), 08-24. 
+
+Preston, O. C. (2018). Psychopathic traits and politics: Examining affiliation, support of political 
+issues, and the role of empathy. Personality and Individual Differences, 142-148. 
+
+Proeschold-Bell, R. J. (2014). Closeness to God Among Those Doing God's Work: A Spiritual 
+Well-Being Measure For Clergy. Journal of Religion and Health, 53(3), 878-894. 
+
+Richardson, A. W. (2002). Narrating the History of Reason Itself: Friedman, Kuhn, and a 
+Constitutive A Priori for the Twenty-First Century. Perspectives on Science, 10(3), 253
+274. 
+
+Sa, W. C. (1999). The Domain Specificity and Generality of Belief Bias: Searching for a 
+Generalizable Critical Thinking Skill. Journal of Educational Psychology, 91(3), 497
+510. 
+
+Scheffer, M. L. (2021). The rise and fall of rationality in language. Proceedings of the National 
+Academy of Sciences of the United States of America, 118(51). 
+
+Spreng, N. R. (2009). The Toronto Empathy Questionaire: Scale development and initial 
+validation of a factor-analytic solution to multiple empathy measures. Journal of 
+personality Assessment, 91(1) 62-71. 
+
+Zhang, Q. Z. (2017). An Analytical Overview of Kohlberg's Theory of Moral Development in 
+College Moral Education in Mainland China. Open Journal of Social Sciences, 151-160. 
+
