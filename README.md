@@ -1,6 +1,13 @@
 # faith-and-insight-survey-analysis
 
+> **Master’s Thesis | Master’s Psychology Research & Analytics Portfolio**
+>
+> This repository contains my Master’s thesis, *Faith & Insight Survey Analysis*. The study examines relationships between religiosity and cognitive insight using survey data, regression, ANOVA, MANOVA, diagnostic testing, and data visualization in R.
+>
+> [View the complete Master’s Psychology Research & Analytics Portfolio](https://github.com/users/rickhegenbart/projects/1)
+
 Project Overview
+
 This project analyzes survey data exploring the relationship between cognitive insight and religiosity. Cognitive insight was measured using the Beck Cognitive Insight Scale, while religiosity was measured using the Centrality of Religiosity Scale. The analysis also reviewed whether age and gender were associated with insight and religiosity scores.
 The project was completed in R using statistical modeling and data visualization. Methods included linear regression, one-way ANOVA, multi-factor ANOVA, MANOVA, diagnostic plots, and score visualizations. Overall, the analyses did not show statistically significant relationships between religiosity, cognitive insight, age, or gender in this sample.
 Research Question
